@@ -3,7 +3,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import cloudinary from "../helpers/cloudinary.js";
 const SECRET = "VCET";
-
+// hi
 export const signup = async (req, res) => {
   const {
     email,
