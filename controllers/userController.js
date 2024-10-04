@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken";
 import cloudinary from "../helpers/cloudinary.js";
 import RiskQuestion from "../models/risk.js";
 const SECRET = "VCET";
+import axios from "axios";
 // hi
 export const signup = async (req, res) => {
   const {
@@ -217,6 +218,14 @@ export const getUser = async (req, res) => {
   console.log(userId);
   try {
     const user = await User.findById(userId);
+    axios
+      .get("http://192.168.221.205:8080/ai/computePortfolio/")
+      .then((response) => {
+        console.log(response.data);
+      })
+      .catch((error) => {
+        console.log({ error: error.message });
+      });
 
     if (!user) {
       return res.status(404).json({
@@ -227,6 +236,7 @@ export const getUser = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       error: "An error occurred while fetching your user information",
+      errors: error.message,
     });
   }
 };
