@@ -2,6 +2,7 @@ import User from "../models/user.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import cloudinary from "../helpers/cloudinary.js";
+import RiskQuestion from "../models/risk.js";
 const SECRET = "VCET";
 // hi
 export const signup = async (req, res) => {
@@ -188,6 +189,44 @@ export const submitrisk = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       error: "An error occurred while updating the user's risk tolerance",
+    });
+  }
+};
+export const getQuestions = async (req, res) => {
+  try {
+    const questions = await RiskQuestion.find(); // Fetch all questions from the database
+    res.json(questions);
+  } catch (error) {
+    res.status(500).json({
+      error: "An error occurred while fetching risk assessment questions",
+    });
+  }
+};
+export const getAllUsers = async (req, res) => {
+  try {
+    const getAllUsers = await User.find();
+    res.json(getAllUsers);
+  } catch (error) {
+    res.status(500).json({
+      error: "An error occurred while fetching risk assessment questions",
+    });
+  }
+};
+export const getUser = async (req, res) => {
+  const userId = req.userId;
+  console.log(userId);
+  try {
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({
+        error: "User not found",
+      });
+    }
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({
+      error: "An error occurred while fetching your user information",
     });
   }
 };
