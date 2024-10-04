@@ -1,6 +1,7 @@
 import User from "../models/user.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import cloudinary from "../helpers/cloudinary.js";
 const SECRET = "VCET";
 
 export const signup = async (req, res) => {
@@ -43,9 +44,13 @@ export const signup = async (req, res) => {
     });
 
     await newUser.save();
-
+    const token = jwt.sign({ email: newUser.email, id: newUser._id }, SECRET, {
+      expiresIn: "30d",
+    });
     res.status(200).json({
       message: "User registered successfully",
+      user: newUser,
+      token: token, // Include the token in the response
     });
   } catch (error) {
     console.error(error);
@@ -57,7 +62,7 @@ export const signin = async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    const existingUser = await userModel.findOne({ email: email });
+    const existingUser = await User.findOne({ email: email });
     if (!existingUser) {
       return res.status(404).json({ message: "user not found" });
     }
@@ -127,14 +132,13 @@ export const editProfile = async (req, res) => {
     if (annualIncome !== undefined) user.annualIncome = annualIncome;
     if (numberOfDependent !== undefined)
       user.numberOfDependent = numberOfDependent;
-    if (healthCondition !== undefined) user.healthCondition = healthCondition;
-    if (highestEdu !== undefined) user.highestEdu = highestEdu;
-    if (futurefinancialgoal !== undefined)
-      user.futurefinancialgoal = futurefinancialgoal;
     if (currentSavings !== undefined) user.currentSavings = currentSavings;
-    if (existingInvestments !== undefined)
-      user.existingInvestments = existingInvestments;
-
+    if (healthCondition) user.healthCondition = healthCondition.split(",");
+    if (highestEdu) user.highestEdu = highestEdu.split(",");
+    if (futurefinancialgoal)
+      user.futurefinancialgoal = futurefinancialgoal.split(",");
+    if (existingInvestments)
+      user.existingInvestments = existingInvestments.split(",");
     // Update the profile image URL if a new image was uploaded
     if (profileImageUrl) {
       user.profileImageUrl = profileImageUrl;
@@ -146,6 +150,8 @@ export const editProfile = async (req, res) => {
     res.status(200).json({ message: "Profile updated successfully", user });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Something went wrong." });
+    res
+      .status(500)
+      .json({ message: "Something went wrong.", error: error.message });
   }
 };

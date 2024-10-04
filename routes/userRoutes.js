@@ -8,7 +8,7 @@ const userRouter = express.Router();
 userRouter.post("/signup", signup);
 userRouter.post("/signin", signin);
 userRouter.patch(
-  "/user/:id/edit",
+  "/editProfile",
   auth,
   upload.single("profileImage"),
   editProfile
