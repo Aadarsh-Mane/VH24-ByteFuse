@@ -218,14 +218,14 @@ export const getUser = async (req, res) => {
   console.log(userId);
   try {
     const user = await User.findById(userId);
-    axios
-      .get("http://192.168.221.205:8080/ai/computePortfolio/")
-      .then((response) => {
-        console.log(response.data);
-      })
-      .catch((error) => {
-        console.log({ error: error.message });
-      });
+    // axios
+    //   .get("http://192.168.221.205:8080/ai/computePortfolio/")
+    //   .then((response) => {
+    //     console.log(response.data);
+    //   })
+    //   .catch((error) => {
+    //     console.log({ error: error.message });
+    //   });
 
     if (!user) {
       return res.status(404).json({
