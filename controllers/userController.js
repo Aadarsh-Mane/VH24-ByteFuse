@@ -155,3 +155,39 @@ export const editProfile = async (req, res) => {
       .json({ message: "Something went wrong.", error: error.message });
   }
 };
+export const submitrisk = async (req, res) => {
+  const userId = req.userId; // Get the user ID from the auth middleware
+  const answers = req.body.answers; // Assume this is an array of selected option points
+
+  // Calculate the total points
+  const totalPoints = answers.reduce((acc, points) => acc + points, 0);
+
+  // Determine the user's risk tolerance category
+  let riskCategory, interpretation;
+  if (totalPoints <= 7) {
+    riskCategory = "low";
+    interpretation = "Prefers stability and capital preservation.";
+  } else if (totalPoints <= 12) {
+    riskCategory = "medium";
+    interpretation = "Open to some risk for potential growth.";
+  } else {
+    riskCategory = "high";
+    interpretation = "Willing to take significant risks for high returns.";
+  }
+
+  // Construct the risk tolerance string
+  // const riskTolerance = `${riskCategory} - ${interpretation}`;
+  const riskTolerance = riskCategory;
+  // Update the user's risk tolerance in the database
+  try {
+    await User.findByIdAndUpdate(userId, { riskTolerance });
+    res.json({
+      totalPoints,
+      riskCategory,
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: "An error occurred while updating the user's risk tolerance",
+    });
+  }
+};
