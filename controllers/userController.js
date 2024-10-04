@@ -76,7 +76,7 @@ export const signin = async (req, res) => {
   } catch (error) {}
 };
 export const editProfile = async (req, res) => {
-  const userId = req.params.id;
+  const userId = req.userId;
   const {
     username,
     age,
