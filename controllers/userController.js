@@ -4,7 +4,9 @@ import jwt from "jsonwebtoken";
 import cloudinary from "../helpers/cloudinary.js";
 import RiskQuestion from "../models/risk.js";
 const SECRET = "VCET";
-import axios from "axios";
+import request from "request";
+import pkg from "scramjet"; // Importing the whole package as default
+const { StringStream } = pkg; // Destructuring to get StringStream
 // hi
 export const signup = async (req, res) => {
   const {
@@ -214,24 +216,21 @@ export const getAllUsers = async (req, res) => {
   }
 };
 export const getUser = async (req, res) => {
-  const userId = req.userId;
+  const userId = req.userId; // Extract the authenticated user ID from the session
   console.log(userId);
+  if (!userId) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+
   try {
-    const user = await User.findById(userId);
-    // axios
-    //   .get("http://192.168.221.205:8080/ai/computePortfolio/")
-    //   .then((response) => {
-    //     console.log(response.data);
-    //   })
-    //   .catch((error) => {
-    //     console.log({ error: error.message });
-    //   });
+    const user = await User.findById(userId); // Use the authenticated user's ID
 
     if (!user) {
       return res.status(404).json({
         error: "User not found",
       });
     }
+
     res.json(user);
   } catch (error) {
     res.status(500).json({
@@ -239,4 +238,97 @@ export const getUser = async (req, res) => {
       errors: error.message,
     });
   }
+};
+
+// Replace the "demo" apikey below with your own key from https://www.alphavantage.co/support/#api-key
+var url =
+  "https://www.alphavantage.co/query?function=NEWS_SENTIMENT&tickers=AAPL&apikey=demo";
+
+export const fetchNews = (req, res) => {
+  request.get(
+    {
+      url: url,
+      json: true,
+      headers: { "User-Agent": "request" },
+    },
+    (err, response, data) => {
+      if (err) {
+        console.log("Error:", err);
+        res.status(500).send("Error fetching news");
+      } else if (response.statusCode !== 200) {
+        console.log("Status:", response.statusCode);
+        res.status(response.statusCode).send("Failed to fetch news");
+      } else {
+        // Log the entire response data to understand its structure
+        console.log("Full response data:", JSON.stringify(data, null, 2));
+
+        // Assuming the data has an array of news articles
+        if (data && data.feed) {
+          // Extracting and formatting the response for all articles
+          const newsArticles = data.feed.map((newsArticle) => {
+            const {
+              title,
+              url,
+              time_published,
+              authors,
+              summary,
+              banner_image,
+              source,
+              source_domain,
+            } = newsArticle;
+            return {
+              title,
+              url,
+              time_published,
+              authors,
+              summary,
+              banner_image,
+              source,
+              source_domain,
+            };
+          });
+
+          // Send the formatted response
+          res.status(200).json(newsArticles);
+        } else {
+          res.status(404).send("No news data found");
+        }
+      }
+    }
+  );
+};
+export const getIPO = (req, res) => {
+  request
+    .get("https://www.alphavantage.co/query?function=IPO_CALENDAR&apikey=demo")
+    .pipe(new StringStream())
+    .CSVParse()
+    .toArray()
+    .then((rows) => {
+      if (rows.length === 0) {
+        res.status(404).json({ message: "No IPO data found" });
+        return;
+      }
+
+      // Extract header from the first row
+      const header = rows[0];
+      const ipoData = [];
+
+      // Process each subsequent row and convert to an object using the header
+      for (let i = 1; i < rows.length; i++) {
+        const row = rows[i];
+        const rowData = {};
+
+        header.forEach((key, index) => {
+          rowData[key] = row[index];
+        });
+
+        ipoData.push(rowData);
+      }
+
+      res.status(200).json(ipoData);
+    })
+    .catch((error) => {
+      console.error("Error fetching IPO data:", error);
+      res.status(500).send("Error fetching IPO data");
+    });
 };

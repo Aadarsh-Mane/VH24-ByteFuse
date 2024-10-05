@@ -9,6 +9,7 @@ export const auth = (req, res, next) => {
       token = token.split(" ")[1];
       let user = jwt.verify(token, SECRET);
       req.userId = user.id;
+      console.log(req.userId);
     } else {
       res.status(401).json({ message: "unauthorized user" });
     }
