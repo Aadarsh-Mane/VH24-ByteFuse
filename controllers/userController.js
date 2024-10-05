@@ -263,7 +263,7 @@ export const fetchNews = (req, res) => {
         res.status(response.statusCode).send("Failed to fetch news");
       } else {
         // Log the entire response data to understand its structure
-        console.log("Full response data:", JSON.stringify(data, null, 2));
+        // console.log("Full response data:", JSON.stringify(data, null, 2));
 
         // Assuming the data has an array of news articles
         if (data && data.feed) {
