@@ -24,6 +24,7 @@ export const signup = async (req, res) => {
   } = req.body;
 
   try {
+    console.log("data here : " + username);
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({ message: "User already exists" });
@@ -84,6 +85,7 @@ export const signin = async (req, res) => {
     res.status(201).json({ user: existingUser, token: token });
   } catch (error) {}
 };
+
 export const editProfile = async (req, res) => {
   const userId = req.userId;
   const {
