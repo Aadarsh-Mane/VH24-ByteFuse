@@ -67,6 +67,7 @@ const userSchema = new mongoose.Schema({
     ],
     default: [],
   },
+  riskTolerance: { type: String, default: " " }, // Field for storing risk tolerance score
 });
 
 const User = mongoose.model("User", userSchema);
