@@ -2,6 +2,8 @@
 
 ### TEAM BYTEFUSE
 
+### api deplyed on vercel https://vercel.com/aadarshmanes-projects/vh-24-byte-fuse
+
 ```bash
 cd vh24backend
 
