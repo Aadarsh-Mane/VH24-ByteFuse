@@ -163,8 +163,9 @@ export const editProfile = async (req, res) => {
 };
 export const submitrisk = async (req, res) => {
   const userId = req.userId; // Get the user ID from the auth middleware
+  console.log(userId);
   const answers = req.body.answers; // Assume this is an array of selected option points
-
+  console.log(answers);
   // Calculate the total points
   const totalPoints = answers.reduce((acc, points) => acc + points, 0);
 

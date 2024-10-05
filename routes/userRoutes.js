@@ -13,6 +13,12 @@ import {
 } from "../controllers/userController.js";
 import upload from "../helpers/multer.js";
 import { addInvestment } from "../controllers/investController.js";
+import {
+  fetchTrends,
+  getRecommendationTrends,
+  getTrendingNews,
+  ipo,
+} from "../controllers/scrapController.js";
 
 const userRouter = express.Router();
 
@@ -21,9 +27,7 @@ userRouter.post("/signin", signin);
 userRouter.post("/submit-risk", auth, submitrisk);
 userRouter.get("/getAllUsers", getAllUsers);
 userRouter.get("/getUser", auth, getUser);
-userRouter.get("/news", fetchNews);
 userRouter.post("/invest", auth, addInvestment);
-userRouter.get("/ipo", getIPO);
 userRouter.get("/getAllQuestions", getQuestions);
 userRouter.patch(
   "/editProfile",
@@ -31,5 +35,9 @@ userRouter.patch(
   upload.single("profileImage"),
   editProfile
 );
+userRouter.get("/ipo", ipo);
+userRouter.get("/news", fetchNews);
+userRouter.get("/trending-news", getTrendingNews);
+userRouter.get("/recommended/:symbol", getRecommendationTrends);
 
 export default userRouter;

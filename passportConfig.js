@@ -24,13 +24,9 @@ passport.use(
           });
           await user.save();
         }
-        const token = jwt.sign(
-          { email: req.user.email, id: req.user._id },
-          SECRET,
-          {
-            expiresIn: "30d",
-          }
-        );
+        const token = jwt.sign({ email: user.email, id: user._id }, SECRET, {
+          expiresIn: "30d",
+        });
         return done(null, user, token);
       } catch (error) {
         return done(error, false);
